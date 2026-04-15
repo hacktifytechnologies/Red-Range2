@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}AGLG — Operations Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Operations Dashboard</h2>
+        <p class="page-subtitle">Real-time cargo intelligence — <span id="live-time"></span></p>
+    </div>
+    <div class="header-actions">
+        <span class="status-pill active">
+            <span class="status-dot"></span>
+            All Systems Operational
+        </span>
+    </div>
+</div>
+
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-icon orange">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+        </div>
+        <div class="metric-data">
+            <span class="metric-val" data-count="12483">0</span>
+            <span class="metric-lab">Active Shipments</span>
+        </div>
+        <div class="metric-trend up">+2.4% this week</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon green">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+        </div>
+        <div class="metric-data">
+            <span class="metric-val" data-count="11941">0</span>
+            <span class="metric-lab">Delivered (30d)</span>
+        </div>
+        <div class="metric-trend up">+5.1% month</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon yellow">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+        </div>
+        <div class="metric-data">
+            <span class="metric-val" data-count="247">0</span>
+            <span class="metric-lab">Customs Holds</span>
+        </div>
+        <div class="metric-trend down">-8 today</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon blue">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+        </div>
+        <div class="metric-data">
+            <span class="metric-val" data-count="47">0</span>
+            <span class="metric-lab">Countries Active</span>
+        </div>
+        <div class="metric-trend neutral">No change</div>
+    </div>
+</div>
+
+<div class="content-grid">
+    <div class="card table-card">
+        <div class="card-header">
+            <h3>Recent Shipments</h3>
+            <a href="{{ url_for('track') }}" class="card-link">View all →</a>
+        </div>
+        <div class="table-wrapper">
+            <table class="data-table" id="shipments-table">
+                <thead>
+                    <tr>
+                        <th>Tracking ID</th>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                        <th>Status</th>
+                        <th>Operator</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in shipments %}
+                    <tr>
+                        <td class="mono">{{ s['tracking_id'] }}</td>
+                        <td>{{ s['origin'] }}</td>
+                        <td>{{ s['destination'] }}</td>
+                        <td>
+                            <span class="badge badge-{{ 'green' if s['status'] == 'Delivered' else 'yellow' if s['status'] == 'In Transit' else 'red' if s['status'] == 'Customs Hold' else 'blue' }}">
+                                {{ s['status'] }}
+                            </span>
+                        </td>
+                        <td>{{ s['operator'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card chart-card">
+        <div class="card-header">
+            <h3>Throughput — Last 7 Days</h3>
+        </div>
+        <div class="chart-area">
+            <canvas id="throughput-chart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+// Live clock
+function updateTime() {
+    document.getElementById('live-time').textContent = new Date().toLocaleTimeString('en-GB', {hour12:false});
+}
+updateTime(); setInterval(updateTime, 1000);
+
+// Count-up animation
+document.querySelectorAll('.metric-val[data-count]').forEach(el => {
+    const target = parseInt(el.dataset.count);
+    let current = 0;
+    const step = Math.ceil(target / 60);
+    const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = current.toLocaleString();
+        if (current >= target) clearInterval(timer);
+    }, 16);
+});
+
+// Simple chart using canvas
+const ctx = document.getElementById('throughput-chart').getContext('2d');
+const data = [392, 418, 401, 444, 428, 467, 451];
+const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const w = ctx.canvas.offsetWidth || 320;
+const h = ctx.canvas.offsetHeight || 140;
+ctx.canvas.width = w; ctx.canvas.height = h;
+const max = Math.max(...data) * 1.1;
+const pad = {t:16, r:16, b:28, l:40};
+function xPos(i) { return pad.l + i * (w - pad.l - pad.r) / (data.length - 1); }
+function yPos(v) { return h - pad.b - (v / max) * (h - pad.t - pad.b); }
+// Grid
+ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+for (let i = 0; i < 4; i++) {
+    const y = pad.t + i * (h - pad.t - pad.b) / 3;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+}
+// Fill
+const grad = ctx.createLinearGradient(0, pad.t, 0, h - pad.b);
+grad.addColorStop(0, 'rgba(249,115,22,0.3)');
+grad.addColorStop(1, 'rgba(249,115,22,0.0)');
+ctx.beginPath();
+ctx.moveTo(xPos(0), yPos(data[0]));
+data.forEach((v,i) => ctx.lineTo(xPos(i), yPos(v)));
+ctx.lineTo(xPos(data.length-1), h - pad.b);
+ctx.lineTo(xPos(0), h - pad.b);
+ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+// Line
+ctx.beginPath(); ctx.strokeStyle = '#F97316'; ctx.lineWidth = 2.5;
+data.forEach((v,i) => i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v)));
+ctx.stroke();
+// Labels
+ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = '11px Inter'; ctx.textAlign = 'center';
+labels.forEach((l,i) => ctx.fillText(l, xPos(i), h - 8));
+</script>
+{% endblock %}

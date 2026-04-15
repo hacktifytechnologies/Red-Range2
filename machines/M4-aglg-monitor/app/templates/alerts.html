@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}AGLG NOC — Active Alerts{% endblock %}
+{% block content %}
+<div class="page-hdr">
+    <div>
+        <h2>Active Alerts</h2>
+        <p class="page-sub">{{ alerts|length }} open alert{% if alerts|length != 1 %}s{% endif %} requiring attention</p>
+    </div>
+</div>
+<div class="card">
+    <div class="card-hdr">
+        <h3>Alert Feed</h3>
+        <span class="alert-ticker" id="alert-ticker">
+            <span class="dot red"></span>LIVE
+        </span>
+    </div>
+    <table class="node-table" id="alerts-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Severity</th>
+                <th>Host</th>
+                <th>Message</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in alerts %}
+            <tr class="alert-row {{ a.severity }}">
+                <td class="mono">{{ a.id }}</td>
+                <td>
+                    <span class="sev-badge {{ a.severity }}">{{ a.severity|upper }}</span>
+                </td>
+                <td class="mono">{{ a.host }}</td>
+                <td>{{ a.msg }}</td>
+                <td>{{ a.time }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

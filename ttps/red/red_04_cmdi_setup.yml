@@ -1,0 +1,66 @@
+---
+# Operation BlackVault — Red TTP | M4: Command Injection Setup
+# Caldera-compatible ability YAML
+# Purpose: Configure aglg-monitor Flask NOC with injectable ping/traceroute utilities
+
+id: red_04_cmdi_setup
+name: "[BLACKVAULT] M4 — Configure Command Injection NOC Dashboard"
+description: |
+  Ensures aglg-monitor Flask application is running on port 5000 with unsanitised
+  subprocess call in /tools/ping and /tools/traceroute. Verifies flag and M5 hint.
+tactic: execution
+technique:
+  attack_id: T1059.004
+  name: "Command and Scripting Interpreter: Unix Shell"
+
+platforms:
+  linux:
+    sh:
+      command: |
+        set -e
+        echo "[*] Verifying M4 aglg-monitor setup..."
+
+        # Ensure virtualenv
+        if [ ! -f /opt/aglg/monitor/venv/bin/gunicorn ]; then
+          python3 -m venv /opt/aglg/monitor/venv
+          /opt/aglg/monitor/venv/bin/pip install --quiet flask gunicorn
+        fi
+
+        # Ensure flag exists
+        if [ ! -f /opt/aglg/flag4.txt ]; then
+          FLAG="FLAG{$(openssl rand -hex 8)_cmdi_netops}"
+          echo "$FLAG" > /opt/aglg/flag4.txt
+          chmod 644 /opt/aglg/flag4.txt
+          echo "M4 (aglg-monitor) Flag: $FLAG" >> /root/ctf_setup_log.txt
+        fi
+
+        # Ensure M5 hint exists
+        if [ ! -f /opt/aglg/hint_m5.txt ]; then
+          echo "[AGLG INTERNAL — VAULT OPS MEMO]\nClassified vault on private net — port 8443 (Go)\narchivist / Arch1v1st@AGLG\nSSH also available on :22\nScan 195.0.0.0/8 on port 8443." > /opt/aglg/hint_m5.txt
+          chmod 644 /opt/aglg/hint_m5.txt
+        fi
+
+        # Ensure netops user
+        id netops &>/dev/null || useradd -m -s /bin/bash netops
+        echo "netops:N3t0ps@Mon1t0r" | chpasswd
+
+        # Restart service
+        systemctl restart aglg-monitor 2>/dev/null || true
+        sleep 1
+        systemctl is-active aglg-monitor && echo "[+] M4 aglg-monitor running on :5000" || echo "[!] Service failed"
+
+      cleanup: |
+        echo "[*] No destructive cleanup for M4 red setup."
+
+executors:
+  - name: sh
+    platform: linux
+    elevation_required: true
+
+tags:
+  - range5
+  - blackvault
+  - cmdi
+  - command-injection
+  - m4
+  - red

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AGLG Cargo Intelligence Platform{% endblock %}</title>
+    <meta name="description" content="Arkanis Global Logistics Group — Cargo Intelligence & Shipment Management Platform">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% if session.user %}
+    <nav class="navbar">
+        <div class="nav-brand">
+            <div class="nav-logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect width="32" height="32" rx="6" fill="#F97316"/>
+                    <path d="M6 22L10 10L16 18L22 12L26 22H6Z" fill="white" opacity="0.9"/>
+                </svg>
+                <span>AGLG</span>
+            </div>
+            <span class="nav-tagline">Cargo Intelligence Platform</span>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{{ url_for('track') }}" class="nav-link {% if request.endpoint == 'track' %}active{% endif %}">Track Shipment</a>
+            <a href="{{ url_for('report') }}" class="nav-link {% if request.endpoint == 'report' %}active{% endif %}">Reports</a>
+            <a href="{{ url_for('inquiry') }}" class="nav-link {% if request.endpoint == 'inquiry' %}active{% endif %}">Inquiry</a>
+        </div>
+        <div class="nav-user">
+            <div class="user-pill">
+                <div class="user-avatar">{{ session.user[0].upper() }}</div>
+                <span>{{ session.user }}</span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn-logout">Sign Out</a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 Arkanis Global Logistics Group. All rights reserved. | Secure Operations Platform v4.2.1</p>
+    </footer>
+</body>
+</html>

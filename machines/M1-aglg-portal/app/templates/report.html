@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}AGLG — Report Generator{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Logistics Report Generator</h2>
+        <p class="page-subtitle">Generate operational summary reports for shipment consignments</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Generate Shipment Report</h3>
+    </div>
+    <form method="post" action="{{ url_for('report') }}" class="search-form" id="report-form">
+        <div class="form-group">
+            <label for="shipment_id">Shipment Reference ID</label>
+            <p class="field-hint">Enter the internal shipment reference to generate a detailed logistics report.</p>
+            <div class="input-wrap">
+                <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                <input type="text" id="shipment_id" name="shipment_id" placeholder="e.g. AGX-20240901-001" autocomplete="off">
+            </div>
+        </div>
+        <button type="submit" class="btn-primary" id="report-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            Generate Report
+        </button>
+    </form>
+</div>
+
+{% if output %}
+<div class="card mt-4" id="report-output">
+    <div class="card-header">
+        <h3>Report Output</h3>
+        <span class="badge badge-green">Generated</span>
+    </div>
+    <div class="terminal-output">
+        <div class="terminal-bar">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot yellow"></span>
+            <span class="terminal-dot green"></span>
+            <span class="terminal-title">report-engine@aglg-portal</span>
+        </div>
+        <pre class="terminal-body mono" id="report-output-pre">{{ output }}</pre>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

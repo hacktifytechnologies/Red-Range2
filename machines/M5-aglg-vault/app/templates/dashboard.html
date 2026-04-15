@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGLG Vault — Document Index</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+    :root{--bg:#090B13;--bg2:#0F1220;--bg3:#161B2E;--bdr:rgba(255,255,255,0.07);--txt:#D9DFF0;--txt2:#6B7792;--txt3:#30384F;--gold:#C9A227;--gold-dim:rgba(201,162,39,.12);--red:#EF4444;--grn:#22C55E;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font);background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px}
+    .layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+    /* Sidebar */
+    .sidebar{background:var(--bg2);border-right:1px solid var(--bdr);display:flex;flex-direction:column;padding:0;position:sticky;top:0;height:100vh}
+    .sb-brand{display:flex;align-items:center;gap:10px;padding:20px;border-bottom:1px solid var(--bdr)}
+    .sb-icon{width:36px;height:36px;border-radius:8px;background:var(--gold-dim);border:1px solid rgba(201,162,39,.3);display:flex;align-items:center;justify-content:center;color:var(--gold)}
+    .sb-name{font-size:13px;font-weight:700}.sb-sub{font-size:10px;color:var(--txt3)}
+    .sb-nav{flex:1;padding:12px}
+    .sb-sec{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);padding:10px 8px 5px;font-weight:600}
+    .sb-link{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:7px;color:var(--txt2);text-decoration:none;font-size:13px;font-weight:500;transition:all .15s;margin-bottom:2px}
+    .sb-link:hover{color:var(--txt);background:var(--bg3)}
+    .sb-link.active{color:var(--gold);background:var(--gold-dim)}
+    .sb-footer{padding:16px 20px;border-top:1px solid var(--bdr);display:flex;align-items:center;gap:8px}
+    .sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
+    .sb-uname{font-size:12px;font-weight:600}
+    .sb-urole{font-size:10px;color:var(--txt3)}
+    .sb-logout{color:var(--txt3);text-decoration:none;font-size:12px;margin-left:auto}
+    .sb-logout:hover{color:var(--red)}
+    /* Main */
+    .main{padding:32px}
+    .page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px}
+    .page-hdr h2{font-size:20px;font-weight:700}
+    .page-sub{font-size:13px;color:var(--txt2);margin-top:4px}
+    .classify-bar{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border:1px solid rgba(201,162,39,.3);border-radius:5px;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.1em}
+    /* Doc grid */
+    .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:8px}
+    .doc-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;padding:20px;transition:all .2s;text-decoration:none;display:flex;flex-direction:column;gap:10px}
+    .doc-card:hover{border-color:rgba(201,162,39,.4);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.5)}
+    .doc-icon{width:40px;height:40px;border-radius:8px;background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:20px}
+    .doc-dir{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)}
+    .doc-name{font-size:13px;font-weight:600;color:var(--txt);word-break:break-word}
+    .doc-action{font-size:11px;color:var(--gold)}
+    .card{background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;overflow:hidden}
+    .card-hdr{padding:14px 20px;border-bottom:1px solid var(--bdr);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+    /* API hint */
+    .api-hint{background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:16px 20px;margin-top:24px;font-size:12px;color:var(--txt2)}
+    .api-hint code{font-family:var(--mono);font-size:12px;color:var(--gold);background:rgba(201,162,39,.08);padding:2px 6px;border-radius:4px}
+    .mono{font-family:var(--mono);font-size:12px}
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sb-brand">
+            <div class="sb-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div><div class="sb-name">AGLG Vault</div><div class="sb-sub">Classified Repository</div></div>
+        </div>
+        <nav class="sb-nav">
+            <div class="sb-sec">VAULT</div>
+            <a href="/dashboard" class="sb-link active" id="nav-docs">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Documents
+            </a>
+            <div class="sb-sec">SYSTEM</div>
+            <a href="/api/status" class="sb-link" id="nav-status" target="_blank">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                API Status
+            </a>
+        </nav>
+        <div class="sb-footer">
+            <div class="sb-avatar">{{if .User}}{{printf "%.1s" .User}}{{end}}</div>
+            <div style="flex:1;min-width:0"><div class="sb-uname">{{.User}}</div><div class="sb-urole">Vault Archivist</div></div>
+            <a href="/logout" class="sb-logout" id="vault-logout">Sign Out</a>
+        </div>
+    </aside>
+    <main class="main">
+        <div class="page-hdr">
+            <div>
+                <h2>Document Index</h2>
+                <p class="page-sub">{{len .Docs}} classified document{{if ne (len .Docs) 1}}s{{end}} in vault</p>
+            </div>
+            <span class="classify-bar">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                CLASSIFIED
+            </span>
+        </div>
+
+        <div class="doc-grid" id="doc-grid">
+            {{range .Docs}}
+            <a href="/view?doc={{.Path}}" class="doc-card" id="doc-{{.Name}}">
+                <div class="doc-icon">📄</div>
+                <div>
+                    <div class="doc-dir">{{.Dir}}</div>
+                    <div class="doc-name">{{.Name}}</div>
+                </div>
+                <div class="doc-action">View document →</div>
+            </a>
+            {{end}}
+        </div>
+
+        <div class="api-hint">
+            <strong>Document Viewer API:</strong> Access documents via
+            <code>GET /view?doc=&lt;path&gt;</code> — e.g.
+            <code>/view?doc=contracts/AGX-CONTRACT-Q1-2024.txt</code>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+---
+# Operation BlackVault — Red TTP | M5: LFI + SUID Setup
+# Caldera-compatible ability YAML
+# Purpose: Compile and deploy SUID vault_reader binary and Go vault server with LFI flaw
+
+id: red_05_lfi_suid_setup
+name: "[BLACKVAULT] M5 — Configure LFI Vault + SUID vault_reader Binary"
+description: |
+  Compiles vault_reader.c as a SUID root binary, builds and deploys the Go vault server
+  with path traversal vulnerability on /view?doc=. Plants final flag at /root/flag5.txt.
+tactic: privilege-escalation
+technique:
+  attack_id: T1548.001
+  name: "Abuse Elevation Control Mechanism: Setuid and Setgid"
+
+platforms:
+  linux:
+    sh:
+      command: |
+        set -e
+        echo "[*] Verifying M5 aglg-vault setup..."
+
+        # Compile SUID binary if not present
+        if [ ! -f /opt/aglg/vault_reader ]; then
+          gcc -o /opt/aglg/vault_reader /opt/ctf/machines/M5-aglg-vault/vault_reader.c -Wall
+          chown root:root /opt/aglg/vault_reader
+          chmod 4755 /opt/aglg/vault_reader
+          echo "[+] vault_reader compiled and SUID bit set"
+        fi
+
+        # Verify SUID bit
+        ls -la /opt/aglg/vault_reader | grep -q "^-rws" && echo "[+] SUID confirmed" || \
+          (chmod 4755 /opt/aglg/vault_reader && echo "[+] SUID bit re-applied")
+
+        # Build Go vault server if binary missing
+        if [ ! -f /opt/aglg/vault-app/vault-server ]; then
+          cd /opt/aglg/vault-app
+          go build -o vault-server . && echo "[+] Go vault server compiled"
+        fi
+
+        # Ensure vault documents exist
+        mkdir -p /opt/aglg/vault/contracts /opt/aglg/vault/manifests
+        [ -f /opt/aglg/vault/contracts/AGX-CONTRACT-Q1-2024.txt ] || \
+          echo "AGLG CLASSIFIED CONTRACT Q1 2024 — Active" > /opt/aglg/vault/contracts/AGX-CONTRACT-Q1-2024.txt
+
+        # Ensure final flag
+        if [ ! -f /root/flag5.txt ]; then
+          FLAG="FLAG{$(openssl rand -hex 8)_lfi_vault_final}"
+          echo "$FLAG" > /root/flag5.txt
+          chmod 400 /root/flag5.txt
+          echo "M5 (aglg-vault) Flag: $FLAG" >> /root/ctf_setup_log.txt
+        fi
+
+        # Ensure archivist user
+        id archivist &>/dev/null || useradd -m -s /bin/bash archivist
+        echo "archivist:Arch1v1st@AGLG" | chpasswd
+
+        # Restart service
+        systemctl restart aglg-vault 2>/dev/null || true
+        sleep 1
+        systemctl is-active aglg-vault && echo "[+] M5 aglg-vault running on :8443" || echo "[!] Service failed"
+
+      cleanup: |
+        echo "[*] No destructive cleanup for M5 red setup."
+
+executors:
+  - name: sh
+    platform: linux
+    elevation_required: true
+
+tags:
+  - range5
+  - blackvault
+  - lfi
+  - suid
+  - path-traversal
+  - m5
+  - red

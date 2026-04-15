@@ -1,0 +1,15 @@
+{
+  "name": "aglg-warehouse",
+  "version": "2.4.1",
+  "description": "AGLG Warehouse Inventory Management API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "morgan": "^1.10.0"
+  },
+  "engines": { "node": ">=18.0.0" }
+}

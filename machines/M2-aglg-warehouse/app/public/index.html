@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGLG Warehouse Management System</title>
+    <meta name="description" content="Arkanis Global Logistics Group — Warehouse Inventory Management">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+    /* ════════════════════════════════════════════════════════════
+       AGLG Warehouse Management — SPA Styles
+    ════════════════════════════════════════════════════════════ */
+    :root {
+      --bg:      #0B0E14; --bg2: #111520; --bg3: #171C2C; --bg4: #1C2235;
+      --border:  rgba(255,255,255,0.07);
+      --txt:     #DDE1EE; --txt2: #7E88A8; --txt3: #3D4460;
+      --teal:    #14B8A6; --teal-dim: rgba(20,184,166,0.12);
+      --gold:    #D4AF37; --gold-dim: rgba(212,175,55,0.12);
+      --green:   #22C55E; --red: #EF4444; --blue: #3B82F6;
+      --font: 'Inter', sans-serif; --mono: 'JetBrains Mono', monospace;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font);background:var(--bg);color:var(--txt);min-height:100vh}
+
+    /* ── Nav ── */
+    .nav{display:flex;align-items:center;gap:20px;padding:0 32px;height:60px;
+      background:rgba(11,14,20,0.95);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+    .nav-brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;margin-right:auto}
+    .nav-logo{width:32px;height:32px;background:var(--teal);border-radius:6px;
+      display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff}
+    .nav-tag{font-size:11px;color:var(--txt3);font-weight:400}
+    #nav-user{display:none;align-items:center;gap:8px;font-size:13px;color:var(--txt2)}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:6px;
+      font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--font);
+      transition:all 0.2s}
+    .btn-teal{background:var(--teal);color:#fff}
+    .btn-teal:hover{background:#0E9687;box-shadow:0 4px 16px rgba(20,184,166,0.3)}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--txt2)}
+    .btn-ghost:hover{border-color:var(--teal);color:var(--teal)}
+    .btn-sm{padding:5px 12px;font-size:12px}
+
+    /* ── Login Screen ── */
+    #login-screen{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:40px}
+    .login-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+      padding:40px;width:100%;max-width:420px}
+    .login-title{font-size:20px;font-weight:700;margin-bottom:6px}
+    .login-sub{font-size:13px;color:var(--txt2);margin-bottom:28px}
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-size:11px;font-weight:600;color:var(--txt2);
+      text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+    .form-group input{width:100%;padding:10px 12px;background:var(--bg3);
+      border:1px solid var(--border);border-radius:6px;color:var(--txt);
+      font-size:14px;font-family:var(--font);outline:none;transition:border-color .2s}
+    .form-group input:focus{border-color:var(--teal)}
+    .form-group input::placeholder{color:var(--txt3)}
+    #login-error{display:none;padding:10px 14px;border-radius:6px;font-size:13px;
+      background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#F87171;margin-bottom:12px}
+
+    /* ── App Screen ── */
+    #app-screen{display:none;padding:32px;max-width:1280px;margin:0 auto}
+    .page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px}
+    .page-hdr h2{font-size:22px;font-weight:700}
+    .page-sub{font-size:13px;color:var(--txt2);margin-top:4px}
+
+    /* ── Metrics ── */
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+    .metric{background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+      padding:20px;transition:border-color .2s,transform .2s}
+    .metric:hover{border-color:rgba(20,184,166,.3);transform:translateY(-2px)}
+    .metric-icon{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;
+      justify-content:center;font-size:18px;margin-bottom:10px}
+    .m-teal{background:var(--teal-dim)} .m-gold{background:var(--gold-dim)}
+    .m-green{background:rgba(34,197,94,.1)} .m-blue{background:rgba(59,130,246,.1)}
+    .metric-val{font-size:24px;font-weight:700;color:var(--txt)}
+    .metric-lab{font-size:12px;color:var(--txt3);margin-top:2px}
+
+    /* ── Toolbar ── */
+    .toolbar{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+    .search-input{flex:1;padding:9px 14px 9px 38px;background:var(--bg2);
+      border:1px solid var(--border);border-radius:7px;color:var(--txt);
+      font-size:13px;font-family:var(--font);outline:none;transition:border-color .2s}
+    .search-input:focus{border-color:var(--teal)}
+    .search-wrap{position:relative;flex:1}
+    .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--txt3);pointer-events:none}
+
+    /* ── Inventory Grid ── */
+    .inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+    .inv-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+      padding:20px;transition:all .2s;cursor:pointer}
+    .inv-card:hover{border-color:rgba(20,184,166,.35);transform:translateY(-2px);
+      box-shadow:0 8px 32px rgba(0,0,0,.4)}
+    .inv-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+    .inv-sku{font-size:11px;color:var(--teal);font-family:var(--mono);font-weight:500}
+    .badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600}
+    .b-green{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+    .b-yellow{background:rgba(234,179,8,.12);color:#EAB308;border:1px solid rgba(234,179,8,.2)}
+    .b-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+    .b-teal{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(20,184,166,.2)}
+    .inv-name{font-size:15px;font-weight:600;color:var(--txt);margin-bottom:8px}
+    .inv-meta{display:flex;gap:16px;font-size:12px;color:var(--txt2)}
+    .inv-meta span{display:flex;align-items:center;gap:4px}
+
+    /* ── API Explorer panel ── */
+    .api-panel{background:var(--bg2);border:1px solid var(--border);border-radius:16px;margin-top:24px}
+    .api-panel-hdr{padding:16px 24px;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between}
+    .api-panel-hdr h3{font-size:15px;font-weight:600}
+    .api-row{display:flex;align-items:center;padding:12px 24px;gap:12px;border-bottom:1px solid var(--border)}
+    .api-row:last-child{border-bottom:none}
+    .method{padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;font-family:var(--mono)}
+    .m-get{background:rgba(59,130,246,.15);color:var(--blue)}
+    .m-post{background:rgba(34,197,94,.15);color:var(--green)}
+    .api-path{font-family:var(--mono);font-size:13px;color:var(--txt2);flex:1}
+    .api-try{cursor:pointer;font-size:12px;color:var(--teal);text-decoration:none}
+    .api-try:hover{text-decoration:underline}
+
+    /* ── Response viewer ── */
+    .response-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+      padding:16px;margin-top:16px;display:none}
+    .response-box pre{font-family:var(--mono);font-size:12px;color:#A3E635;white-space:pre-wrap;word-break:break-all}
+    .response-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .response-hdr span{font-size:12px;font-weight:600;color:var(--txt2)}
+    #response-status{font-family:var(--mono);font-size:12px}
+    .status-ok{color:var(--green)} .status-err{color:var(--red)}
+
+    /* ── Loader ── */
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.1);
+      border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <div class="nav-brand">
+        <div class="nav-logo">WH</div>
+        <div>
+            <div>AGLG Warehouse</div>
+            <div class="nav-tag">Inventory Management System v2.4.1</div>
+        </div>
+    </div>
+    <div id="nav-user">
+        <span id="nav-username">—</span>
+        <button class="btn btn-ghost btn-sm" onclick="logout()" id="btn-logout">Sign Out</button>
+    </div>
+</nav>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+    <div class="login-box">
+        <div style="font-size:32px;margin-bottom:16px">📦</div>
+        <div class="login-title">Warehouse Access Portal</div>
+        <div class="login-sub">Enter your operator credentials to access the inventory system</div>
+        <div id="login-error"></div>
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="uname" placeholder="Operator username" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="passwd" placeholder="Access credential" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <button class="btn btn-teal" style="width:100%" onclick="doLogin()" id="login-btn">Authenticate</button>
+    </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="app-screen">
+    <div class="page-hdr">
+        <div>
+            <h2>Inventory Dashboard</h2>
+            <p class="page-sub">Warehouse stock levels and consignment tracking — AGLG DMZ Facility</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="showApiPanel()">API Explorer</button>
+    </div>
+
+    <div class="metrics">
+        <div class="metric">
+            <div class="metric-icon m-teal">📦</div>
+            <div class="metric-val" id="m-total">—</div>
+            <div class="metric-lab">Total Items</div>
+        </div>
+        <div class="metric">
+            <div class="metric-icon m-green">✅</div>
+            <div class="metric-val" id="m-avail">—</div>
+            <div class="metric-lab">Available</div>
+        </div>
+        <div class="metric">
+            <div class="metric-icon m-gold">🔒</div>
+            <div class="metric-val" id="m-restrict">—</div>
+            <div class="metric-lab">Restricted</div>
+        </div>
+        <div class="metric">
+            <div class="metric-icon m-blue">📊</div>
+            <div class="metric-val" id="m-inuse">—</div>
+            <div class="metric-lab">In Use</div>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-wrap">
+            <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="search-input" placeholder="Search inventory by name or SKU..." oninput="filterInv(this.value)" id="inv-search">
+        </div>
+        <button class="btn btn-teal btn-sm" onclick="loadInventory()">Refresh</button>
+    </div>
+
+    <div class="inv-grid" id="inv-grid"></div>
+
+    <!-- API Explorer -->
+    <div class="api-panel" id="api-panel" style="display:none">
+        <div class="api-panel-hdr">
+            <h3>API Explorer</h3>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('api-panel').style.display='none'">Close</button>
+        </div>
+        <div class="api-row">
+            <span class="method m-post">POST</span>
+            <span class="api-path">/api/login</span>
+            <span class="api-try" onclick="apiTry('POST','/api/login',JSON.stringify({username:'vendor_ops',password:'V3nd0r@AGLG'}))">Try</span>
+        </div>
+        <div class="api-row">
+            <span class="method m-get">GET</span>
+            <span class="api-path">/api/inventory</span>
+            <span class="api-try" onclick="apiTry('GET','/api/inventory')">Try</span>
+        </div>
+        <div class="api-row">
+            <span class="method m-get">GET</span>
+            <span class="api-path">/api/inventory/:id  &nbsp;<em style="color:#3D4460">(no ownership check)</em></span>
+            <span class="api-try" onclick="apiTry('GET','/api/inventory/'+prompt('Enter inventory ID:'))">Try</span>
+        </div>
+        <div class="api-row">
+            <span class="method m-get">GET</span>
+            <span class="api-path">/api/admin/secrets</span>
+            <span class="api-try" onclick="apiTry('GET','/api/admin/secrets')">Try</span>
+        </div>
+        <div class="api-row">
+            <span class="method m-get">GET</span>
+            <span class="api-path">/.well-known/config</span>
+            <span class="api-try" onclick="apiTry('GET','/.well-known/config',null,false)">Try</span>
+        </div>
+        <div style="padding:0 24px 16px">
+            <div class="response-box" id="response-box">
+                <div class="response-hdr">
+                    <span>API Response</span>
+                    <span id="response-status"></span>
+                </div>
+                <pre id="response-body"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let TOKEN = null;
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+async function doLogin() {
+    const u = document.getElementById('uname').value.trim();
+    const p = document.getElementById('passwd').value;
+    const errEl = document.getElementById('login-error');
+    const btn = document.getElementById('login-btn');
+    if (!u || !p) { errEl.style.display='flex'; errEl.textContent='Please enter username and password.'; return; }
+    btn.innerHTML = '<span class="spinner"></span> Authenticating…';
+    btn.disabled = true;
+    try {
+        const r = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u,password:p}) });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error);
+        TOKEN = d.token;
+        document.getElementById('nav-username').textContent = d.user.username + ' (' + d.user.role + ')';
+        document.getElementById('nav-user').style.display = 'flex';
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'block';
+        errEl.style.display = 'none';
+        loadInventory();
+    } catch(e) {
+        errEl.style.display = 'flex'; errEl.textContent = 'Authentication failed: ' + e.message;
+        btn.innerHTML = 'Authenticate'; btn.disabled = false;
+    }
+}
+
+function logout() {
+    TOKEN = null;
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app-screen').style.display = 'none';
+    document.getElementById('nav-user').style.display = 'none';
+    document.getElementById('uname').value = '';
+    document.getElementById('passwd').value = '';
+}
+
+// ── Inventory ─────────────────────────────────────────────────────────────────
+let allItems = [];
+async function loadInventory() {
+    const r = await fetch('/api/inventory', { headers:{'x-auth-token': TOKEN} });
+    const d = await r.json();
+    allItems = d.items || [];
+    renderInv(allItems);
+    document.getElementById('m-total').textContent    = allItems.length;
+    document.getElementById('m-avail').textContent    = allItems.filter(i=>i.status==='Available').length;
+    document.getElementById('m-restrict').textContent = allItems.filter(i=>i.status==='Restricted').length;
+    document.getElementById('m-inuse').textContent    = allItems.filter(i=>i.status==='In Use').length;
+}
+
+function renderInv(items) {
+    const g = document.getElementById('inv-grid');
+    const sc = {'Available':'b-green','In Use':'b-yellow','Restricted':'b-red'};
+    g.innerHTML = items.map(i=>`
+      <div class="inv-card">
+        <div class="inv-card-top">
+          <span class="inv-sku">${i.sku}</span>
+          <span class="badge ${sc[i.status]||'b-teal'}">${i.status}</span>
+        </div>
+        <div class="inv-name">${i.name}</div>
+        <div class="inv-meta">
+          <span>📦 Qty: ${i.qty}</span>
+          <span>📍 Zone: ${i.zone}</span>
+        </div>
+      </div>`).join('');
+}
+
+function filterInv(q) {
+    const filtered = allItems.filter(i => i.name.toLowerCase().includes(q.toLowerCase()) || i.sku.toLowerCase().includes(q.toLowerCase()));
+    renderInv(filtered);
+}
+
+// ── API Explorer ──────────────────────────────────────────────────────────────
+function showApiPanel() { document.getElementById('api-panel').style.display='block'; }
+
+async function apiTry(method, path, body, auth=true) {
+    const box  = document.getElementById('response-box');
+    const pre  = document.getElementById('response-body');
+    const stat = document.getElementById('response-status');
+    if (!path || path === 'null') return;
+    const opts = { method, headers: {} };
+    if (auth && TOKEN) opts.headers['x-auth-token'] = TOKEN;
+    if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = body; }
+    try {
+        const r = await fetch(path, opts);
+        const d = await r.json();
+        box.style.display = 'block';
+        pre.textContent = JSON.stringify(d, null, 2);
+        stat.textContent = r.status + ' ' + (r.ok ? 'OK' : 'ERROR');
+        stat.className = r.ok ? 'status-ok' : 'status-err';
+    } catch(e) {
+        box.style.display='block'; pre.textContent=e.message; stat.textContent='ERROR'; stat.className='status-err';
+    }
+}
+</script>
+</body>
+</html>

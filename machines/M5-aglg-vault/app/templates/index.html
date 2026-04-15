@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGLG Classified Vault — Access Portal</title>
+    <meta name="description" content="Arkanis Global Logistics Group — Classified Document Vault">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+    :root{--bg:#090B13;--bg2:#0F1220;--bg3:#161B2E;--bdr:rgba(255,255,255,0.07);--txt:#D9DFF0;--txt2:#6B7792;--txt3:#30384F;--gold:#C9A227;--gold-dim:rgba(201,162,39,.12);--red:#EF4444;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font);background:var(--bg);color:var(--txt);min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .vault-wrap{display:grid;grid-template-columns:420px 1fr;min-height:100vh;width:100%}
+    .vault-panel{background:var(--bg2);border-right:1px solid var(--bdr);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 48px;gap:36px}
+    .vault-emblem{display:flex;flex-direction:column;align-items:center;gap:16px}
+    .vault-ring{width:80px;height:80px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;position:relative;animation:ring-pulse 3s ease-in-out infinite}
+    @keyframes ring-pulse{0%,100%{box-shadow:0 0 0 0 rgba(201,162,39,.3)}50%{box-shadow:0 0 0 12px rgba(201,162,39,.0)}}
+    .vault-ring svg{color:var(--gold)}
+    .vault-title{font-size:22px;font-weight:700;text-align:center}
+    .vault-sub{font-size:13px;color:var(--txt2);text-align:center}
+    .vault-card{width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:32px;display:flex;flex-direction:column;gap:20px}
+    .vcard-title{font-size:16px;font-weight:600}
+    .err-box{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:7px;font-size:13px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:var(--red)}
+    .fgrp{display:flex;flex-direction:column;gap:6px}
+    .fgrp label{font-size:11px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em}
+    .fgrp input{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--bdr);border-radius:7px;color:var(--txt);font-size:14px;font-family:var(--mono);outline:none;transition:border-color .2s}
+    .fgrp input:focus{border-color:var(--gold)}
+    .fgrp input::placeholder{color:var(--txt3)}
+    .btn{width:100%;padding:11px;border-radius:7px;background:var(--gold);color:#000;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;letter-spacing:.03em}
+    .btn:hover{background:#DEB832;box-shadow:0 4px 16px rgba(201,162,39,.35)}
+    .vault-meta{font-size:11px;color:var(--txt3);text-align:center;display:flex;flex-direction:column;gap:4px}
+    .vault-meta span{display:block}
+    .vault-bg{background:linear-gradient(160deg,#07090F 0%,#0A0D18 100%);display:flex;align-items:center;justify-content:center;padding:60px;position:relative;overflow:hidden}
+    .bg-deco{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.04}
+    .bg-deco svg{width:600px;height:600px;color:var(--gold)}
+    .bg-text{position:relative;z-index:1;display:flex;flex-direction:column;gap:32px}
+    .classify-stamp{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border:2px solid rgba(201,162,39,.4);border-radius:4px;font-size:13px;font-weight:700;color:var(--gold);letter-spacing:.12em;text-transform:uppercase}
+    .vault-feature-list{display:flex;flex-direction:column;gap:18px}
+    .vf{display:flex;align-items:flex-start;gap:14px}
+    .vf-icon{font-size:22px;flex-shrink:0}
+    .vf strong{display:block;font-size:14px;font-weight:600;margin-bottom:3px}
+    .vf p{font-size:12px;color:var(--txt2)}
+    </style>
+</head>
+<body>
+<div class="vault-wrap">
+    <div class="vault-panel">
+        <div class="vault-emblem">
+            <div class="vault-ring">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+            </div>
+            <div class="vault-title">AGLG Classified Vault</div>
+            <div class="vault-sub">Authorised personnel only — PHANTOM CIRCUIT APT RESTRICTED</div>
+        </div>
+
+        <div class="vault-card">
+            <div class="vcard-title">Vault Authentication</div>
+            {{if .Error}}
+            <div class="err-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                {{.Error}}
+            </div>
+            {{end}}
+            <form method="post" action="/login" id="vault-login-form">
+                <div class="fgrp" style="margin-bottom:14px">
+                    <label for="username">Vault User ID</label>
+                    <input type="text" id="username" name="username" placeholder="e.g. archivist" autocomplete="off" required>
+                </div>
+                <div class="fgrp" style="margin-bottom:20px">
+                    <label for="password">Vault Passphrase</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••••••••••" required>
+                </div>
+                <button type="submit" class="btn" id="vault-login-btn">AUTHENTICATE ACCESS</button>
+            </form>
+        </div>
+
+        <div class="vault-meta">
+            <span>AGLG Classified Document Vault v1.0.3</span>
+            <span>AES-256 Encrypted Storage — TLS Transport</span>
+        </div>
+    </div>
+    <div class="vault-bg">
+        <div class="bg-deco">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.3">
+                <rect x="3" y="11" width="18" height="11" rx="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+        </div>
+        <div class="bg-text">
+            <div class="classify-stamp">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                AGLG Classified — Restricted Access
+            </div>
+            <div class="vault-feature-list">
+                <div class="vf">
+                    <span class="vf-icon">📁</span>
+                    <div>
+                        <strong>Classified Contract Repository</strong>
+                        <p>Long-term storage of signed logistics contracts, route authorisations, and cargo manifests</p>
+                    </div>
+                </div>
+                <div class="vf">
+                    <span class="vf-icon">🔐</span>
+                    <div>
+                        <strong>End-to-End Encrypted Storage</strong>
+                        <p>All documents encrypted at rest with AES-256 and access-controlled by role</p>
+                    </div>
+                </div>
+                <div class="vf">
+                    <span class="vf-icon">📋</span>
+                    <div>
+                        <strong>Audit Trail & Access Logging</strong>
+                        <p>Every document access is logged with timestamp, user, and IP address</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}AGLG NOC — Dashboard{% endblock %}
+{% block content %}
+<div class="page-hdr">
+    <div>
+        <h2>Infrastructure Dashboard</h2>
+        <p class="page-sub">Real-time health view — {{ nodes|length }} monitored nodes</p>
+    </div>
+    <div class="hdr-right">
+        <span class="refresh-note">Auto-refresh every 30s</span>
+    </div>
+</div>
+
+<!-- Summary row -->
+<div class="summary-row">
+    <div class="summary-pill green">
+        <span class="pill-val">{{ nodes|selectattr('status','eq','up')|list|length }}</span>
+        <span class="pill-lab">Operational</span>
+    </div>
+    <div class="summary-pill yellow">
+        <span class="pill-val">{{ nodes|selectattr('status','eq','warn')|list|length }}</span>
+        <span class="pill-lab">Warning</span>
+    </div>
+    <div class="summary-pill red">
+        <span class="pill-val">{{ nodes|selectattr('status','eq','down')|list|length }}</span>
+        <span class="pill-lab">Down</span>
+    </div>
+    <div class="summary-pill blue">
+        <span class="pill-val">{{ alerts|length }}</span>
+        <span class="pill-lab">Active Alerts</span>
+    </div>
+</div>
+
+<!-- Latency chart -->
+<div class="card mb">
+    <div class="card-hdr">
+        <h3>Network Latency — Last 60 minutes</h3>
+        <div class="legend">
+            <span class="leg-item"><span class="leg-dot green"></span>Normal</span>
+            <span class="leg-item"><span class="leg-dot yellow"></span>Degraded</span>
+        </div>
+    </div>
+    <div class="chart-wrap">
+        <canvas id="latency-chart" height="100"></canvas>
+    </div>
+</div>
+
+<!-- Node grid -->
+<div class="card">
+    <div class="card-hdr">
+        <h3>Monitored Nodes</h3>
+    </div>
+    <div class="node-table-wrap">
+        <table class="node-table" id="node-table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Hostname</th>
+                    <th>IP Address</th>
+                    <th>Role</th>
+                    <th>Latency</th>
+                    <th>Uptime</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for node in nodes %}
+                <tr class="node-row {{ node.status }}">
+                    <td>
+                        <span class="status-led {{ node.status }}"></span>
+                        <span class="status-text">{{ node.status|upper }}</span>
+                    </td>
+                    <td class="mono">{{ node.name }}</td>
+                    <td class="mono">{{ node.ip }}</td>
+                    <td>{{ node.role }}</td>
+                    <td class="latency {% if node.latency > 30 %}warn{% elif node.latency == 0 %}dead{% endif %}">
+                        {% if node.latency > 0 %}{{ node.latency }} ms{% else %}—{% endif %}
+                    </td>
+                    <td>
+                        <div class="uptime-bar-wrap">
+                            <span class="uptime-val">{{ node.uptime }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('ping_tool') }}?host={{ node.ip }}" class="action-link" id="ping-{{ loop.index }}">Ping</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+// Latency sparkline chart
+const canvas = document.getElementById('latency-chart');
+const ctx = canvas.getContext('2d');
+const w = canvas.parentElement.offsetWidth || 800;
+const h = 100;
+canvas.width = w; canvas.height = h;
+const pts = Array.from({length:60},()=> Math.max(2, 8 + Math.random()*18 + (Math.random()>0.9?35:0)));
+const max = 60; const pad = {t:10, r:16, b:24, l:40};
+function xp(i){ return pad.l + i*(w-pad.l-pad.r)/59; }
+function yp(v){ return h-pad.b-(v/max)*(h-pad.t-pad.b); }
+// grid
+ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1;
+[0,20,40,60].forEach(v=>{
+    ctx.beginPath(); ctx.moveTo(pad.l,yp(v)); ctx.lineTo(w-pad.r,yp(v)); ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='10px Inter'; ctx.textAlign='right';
+    ctx.fillText(v+'ms', pad.l-4, yp(v)+4);
+});
+// fill
+const g = ctx.createLinearGradient(0,pad.t,0,h-pad.b);
+g.addColorStop(0,'rgba(34,197,94,0.25)'); g.addColorStop(1,'rgba(34,197,94,0.0)');
+ctx.beginPath(); ctx.moveTo(xp(0),yp(pts[0]));
+pts.forEach((v,i)=> ctx.lineTo(xp(i),yp(v)));
+ctx.lineTo(xp(59),h-pad.b); ctx.lineTo(xp(0),h-pad.b);
+ctx.closePath(); ctx.fillStyle=g; ctx.fill();
+// line
+ctx.beginPath(); ctx.strokeStyle='#22C55E'; ctx.lineWidth=1.8;
+pts.forEach((v,i)=> i===0 ? ctx.moveTo(xp(i),yp(v)) : ctx.lineTo(xp(i),yp(v)));
+ctx.stroke();
+// warning line
+ctx.beginPath(); ctx.setLineDash([4,3]); ctx.strokeStyle='rgba(234,179,8,0.5)'; ctx.lineWidth=1;
+ctx.moveTo(pad.l,yp(30)); ctx.lineTo(w-pad.r,yp(30)); ctx.stroke();
+ctx.setLineDash([]);
+// x labels
+ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='10px Inter'; ctx.textAlign='center';
+['60m','45m','30m','15m','Now'].forEach((l,i)=> ctx.fillText(l, xp(i*15), h-6));
+</script>
+{% endblock %}

@@ -1,0 +1,69 @@
+---
+# Operation BlackVault — Red TTP | M3: Unrestricted File Upload Setup
+# Caldera-compatible ability YAML
+# Purpose: Configure PHP HR portal with unrestricted upload, web-accessible uploads dir
+
+id: red_03_fileupload_setup
+name: "[BLACKVAULT] M3 — Configure Unrestricted File Upload HR Portal"
+description: |
+  Ensures aglg-hrportal Apache/PHP is running on port 8080 with uploads/ directory
+  world-accessible and PHP execution not blocked. Verifies flag and M4 hint are in place.
+tactic: initial-access
+technique:
+  attack_id: T1190
+  name: Exploit Public-Facing Application
+
+platforms:
+  linux:
+    sh:
+      command: |
+        set -e
+        echo "[*] Verifying M3 aglg-hrportal setup..."
+
+        # Ensure Apache running on 8080
+        systemctl is-active apache2 || systemctl start apache2
+        a2ensite aglg-hr.conf 2>/dev/null || true
+        systemctl reload apache2
+
+        # Ensure uploads dir writable by www-data
+        mkdir -p /var/www/aglg-hr/uploads
+        chown www-data:www-data /var/www/aglg-hr/uploads
+        chmod 755 /var/www/aglg-hr/uploads
+
+        # Ensure flag exists
+        if [ ! -f /opt/aglg/flag3.txt ]; then
+          FLAG="FLAG{$(openssl rand -hex 8)_webshell_rce}"
+          echo "$FLAG" > /opt/aglg/flag3.txt
+          chmod 644 /opt/aglg/flag3.txt
+          echo "M3 (aglg-hrportal) Flag: $FLAG" >> /root/ctf_setup_log.txt
+        fi
+
+        # Ensure M4 hint exists
+        if [ ! -f /opt/aglg/hint_m4.txt ]; then
+          echo "[AGLG INTERNAL — NOC MEMO]\nMonitor dashboard on private net — port 5000\nnetops / N3t0ps@Mon1t0r\nScan 195.0.0.0/8 on port 5000." > /opt/aglg/hint_m4.txt
+          chmod 644 /opt/aglg/hint_m4.txt
+        fi
+
+        # Verify hr_ops SSH accessible
+        id hr_ops &>/dev/null || useradd -m -s /bin/bash hr_ops
+        echo "hr_ops:HR0ps@AGLG24" | chpasswd
+
+        echo "[+] M3 aglg-hrportal verified on :8080"
+
+      cleanup: |
+        # Remove any webshells from uploads (cleanup after exercise)
+        rm -f /var/www/aglg-hr/uploads/*.php 2>/dev/null || true
+        echo "[*] Cleaned webshells from uploads dir."
+
+executors:
+  - name: sh
+    platform: linux
+    elevation_required: true
+
+tags:
+  - range5
+  - blackvault
+  - fileupload
+  - webshell
+  - m3
+  - red

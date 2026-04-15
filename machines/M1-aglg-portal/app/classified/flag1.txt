@@ -1,0 +1,1 @@
+FLAG{deadbeef01234567_sqli_auth_bypass}

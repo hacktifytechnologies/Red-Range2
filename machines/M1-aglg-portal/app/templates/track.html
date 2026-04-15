@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}AGLG — Shipment Tracker{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Shipment Tracker</h2>
+        <p class="page-subtitle">Query live position and status of any cargo consignment</p>
+    </div>
+</div>
+
+<div class="card search-card">
+    <div class="card-header">
+        <h3>Consignment Lookup</h3>
+    </div>
+    <form method="post" action="{{ url_for('track') }}" class="search-form" id="track-form">
+        <div class="search-row">
+            <div class="form-group flex-1">
+                <label for="tracking_id">Tracking ID (e.g. AGX-20240901-001)</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" id="tracking_id" name="tracking_id" placeholder="Enter consignment tracking ID" autocomplete="off">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" id="track-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                Search
+            </button>
+        </div>
+    </form>
+</div>
+
+{% if result %}
+<div class="card result-card" id="tracking-result">
+    <div class="card-header">
+        <h3>Consignment Details</h3>
+        <span class="badge badge-{{ 'green' if result['status'] == 'Delivered' else 'yellow' if result['status'] == 'In Transit' else 'red' if result['status'] == 'Customs Hold' else 'blue' }}">
+            {{ result['status'] }}
+        </span>
+    </div>
+    <div class="result-grid">
+        <div class="result-field">
+            <span class="field-label">Tracking ID</span>
+            <span class="field-val mono">{{ result['tracking_id'] }}</span>
+        </div>
+        <div class="result-field">
+            <span class="field-label">Origin</span>
+            <span class="field-val">{{ result['origin'] }}</span>
+        </div>
+        <div class="result-field">
+            <span class="field-label">Destination</span>
+            <span class="field-val">{{ result['destination'] }}</span>
+        </div>
+        <div class="result-field">
+            <span class="field-label">Assigned Operator</span>
+            <span class="field-val">{{ result['operator'] }}</span>
+        </div>
+    </div>
+    <div class="route-viz">
+        <div class="route-node origin">
+            <div class="node-dot"></div>
+            <span>{{ result['origin'] }}</span>
+        </div>
+        <div class="route-line">
+            <div class="route-progress {% if result['status'] == 'Delivered' %}full{% elif result['status'] == 'In Transit' %}half{% else %}quarter{% endif %}"></div>
+            <div class="route-ship">🚢</div>
+        </div>
+        <div class="route-node dest">
+            <div class="node-dot"></div>
+            <span>{{ result['destination'] }}</span>
+        </div>
+    </div>
+</div>
+{% elif request.method == 'POST' %}
+<div class="card" id="no-result">
+    <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <p>No consignment found for the provided tracking ID.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

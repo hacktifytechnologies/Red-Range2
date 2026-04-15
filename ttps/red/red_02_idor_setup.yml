@@ -1,0 +1,56 @@
+---
+# Operation BlackVault — Red TTP | M2: IDOR Setup
+# Caldera-compatible ability YAML
+# Purpose: Configure the aglg-warehouse Node.js API with IDOR-vulnerable /api/inventory/:id endpoint
+
+id: red_02_idor_setup
+name: "[BLACKVAULT] M2 — Configure IDOR Vulnerable Warehouse API"
+description: |
+  Ensures aglg-warehouse Node.js/Express API is running with admin user at ID=0,
+  no ownership check on /api/inventory/:id, and credentials chain embedded in admin object.
+tactic: discovery
+technique:
+  attack_id: T1087
+  name: Account Discovery
+
+platforms:
+  linux:
+    sh:
+      command: |
+        set -e
+        echo "[*] Verifying M2 aglg-warehouse setup..."
+
+        # Check node_modules installed
+        if [ ! -d /opt/aglg/warehouse/node_modules ]; then
+          cd /opt/aglg/warehouse && npm install --silent
+        fi
+
+        # Verify server.js has correct placeholders filled
+        if grep -q "FLAG2_PLACEHOLDER" /opt/aglg/warehouse/server.js 2>/dev/null; then
+          FLAG="FLAG{$(openssl rand -hex 8)_idor_bac}"
+          sed -i "s|FLAG2_PLACEHOLDER|$FLAG|g" /opt/aglg/warehouse/server.js
+          sed -i "s|CRED_M3_PLACEHOLDER|hr_ops : HR0ps@AGLG24|g" /opt/aglg/warehouse/server.js
+          echo "[+] Injected flag and creds into server.js"
+          echo "M2 (aglg-warehouse) Flag: $FLAG" >> /root/ctf_setup_log.txt
+        fi
+
+        # Restart service
+        systemctl restart aglg-warehouse 2>/dev/null || true
+        sleep 2
+        systemctl is-active aglg-warehouse && echo "[+] M2 aglg-warehouse running on :3000" || echo "[!] Service failed"
+
+      cleanup: |
+        echo "[*] No destructive cleanup for M2 red setup."
+
+executors:
+  - name: sh
+    platform: linux
+    elevation_required: true
+
+tags:
+  - range5
+  - blackvault
+  - idor
+  - bac
+  - m2
+  - red

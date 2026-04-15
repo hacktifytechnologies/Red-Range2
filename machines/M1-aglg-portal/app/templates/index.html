@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}AGLG — Operator Sign In{% endblock %}
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="login-logo">
+            <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                <rect width="56" height="56" rx="12" fill="#F97316"/>
+                <path d="M10 38L18 16L28 32L38 20L46 38H10Z" fill="white" opacity="0.9"/>
+            </svg>
+        </div>
+        <div class="login-header">
+            <h1>AGLG Cargo Intelligence</h1>
+            <p>Secure operator access — authorised personnel only</p>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error" id="login-error-alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('login') }}" class="login-form" id="login-form">
+            <div class="form-group">
+                <label for="username">Operator Username</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <input type="text" id="username" name="username" placeholder="Enter operator ID" autocomplete="off" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password">Access Credential</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    <input type="password" id="password" name="password" placeholder="Enter access credential" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" id="login-btn">
+                <span>Authenticate</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </form>
+
+        <div class="login-meta">
+            <span class="security-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                TLS 1.3 Encrypted
+            </span>
+            <span>AGLG Secure Operations Platform v4.2.1</span>
+        </div>
+    </div>
+
+    <div class="login-bg-panel">
+        <div class="globe-graphic">
+            <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" class="globe-svg">
+                <circle cx="200" cy="200" r="160" stroke="#F97316" stroke-width="1" opacity="0.15"/>
+                <circle cx="200" cy="200" r="120" stroke="#F97316" stroke-width="1" opacity="0.1"/>
+                <circle cx="200" cy="200" r="80" stroke="#F97316" stroke-width="1" opacity="0.08"/>
+                <ellipse cx="200" cy="200" rx="160" ry="60" stroke="#F97316" stroke-width="1" opacity="0.12"/>
+                <ellipse cx="200" cy="200" rx="160" ry="100" stroke="#F97316" stroke-width="1" opacity="0.08"/>
+                <line x1="40" y1="200" x2="360" y2="200" stroke="#F97316" stroke-width="1" opacity="0.12"/>
+                <line x1="200" y1="40" x2="200" y2="360" stroke="#F97316" stroke-width="1" opacity="0.12"/>
+                <!-- Route dots -->
+                <circle cx="100" cy="150" r="4" fill="#F97316" opacity="0.8"/>
+                <circle cx="260" cy="180" r="4" fill="#F97316" opacity="0.8"/>
+                <circle cx="310" cy="130" r="4" fill="#F97316" opacity="0.8"/>
+                <circle cx="150" cy="270" r="4" fill="#F97316" opacity="0.8"/>
+                <circle cx="220" cy="90" r="4" fill="#F97316" opacity="0.8"/>
+                <path d="M100 150 Q180 110 260 180" stroke="#F97316" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+                <path d="M260 180 Q290 155 310 130" stroke="#F97316" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+                <path d="M100 150 Q125 210 150 270" stroke="#F97316" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+            </svg>
+        </div>
+        <div class="panel-stats">
+            <div class="stat-item">
+                <span class="stat-val">47</span>
+                <span class="stat-lab">Countries</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">12,400+</span>
+                <span class="stat-lab">Active Shipments</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">99.7%</span>
+                <span class="stat-lab">On-Time Delivery</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}AGLG NOC — Sign In{% endblock %}
+{% block content %}
+<div class="login-wrap">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="noc-logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+            </div>
+            <h1>NOC Access Portal</h1>
+            <p>Enter your operator credentials to access the infrastructure monitoring platform</p>
+        </div>
+
+        {% if error %}
+        <div class="alert-err" id="login-err">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('login') }}" id="login-form">
+            <div class="fgrp">
+                <label for="username">Operator ID</label>
+                <input type="text" id="username" name="username" placeholder="noc_operator" autocomplete="off" required>
+            </div>
+            <div class="fgrp">
+                <label for="password">Passphrase</label>
+                <input type="password" id="password" name="password" placeholder="••••••••••••" required>
+            </div>
+            <button type="submit" id="login-btn" class="btn-primary">Authenticate</button>
+        </form>
+
+        <div class="login-meta">
+            <span class="sec-tag">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                Restricted Access — AGLG Infrastructure
+            </span>
+        </div>
+    </div>
+</div>
+{% endblock %}

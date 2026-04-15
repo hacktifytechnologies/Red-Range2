@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}AGLG NOC — {% if tool == 'ping' %}Ping{% else %}Traceroute{% endif %} Tool{% endblock %}
+{% block content %}
+<div class="page-hdr">
+    <div>
+        <h2>Network Diagnostic — {{ 'Ping' if tool == 'ping' else 'Traceroute' }}</h2>
+        <p class="page-sub">Send {% if tool == 'ping' %}ICMP echo requests{% else %}route-discovery packets{% endif %} to any host or IP address</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-hdr">
+        <h3>{{ 'Host Reachability Check' if tool == 'ping' else 'Route Tracing' }}</h3>
+    </div>
+    <div class="tool-body">
+        <form method="post" id="diag-form">
+            <div class="tool-row">
+                <div class="fgrp flex-1">
+                    <label for="host">Target Host / IP Address</label>
+                    <div class="input-wrap">
+                        <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        </svg>
+                        <input type="text" id="host" name="host" placeholder="e.g. 8.8.8.8 or aglg-portal"
+                               value="{{ request.form.get('host','') }}" autocomplete="off">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="run-btn">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    Run {{ 'Ping' if tool == 'ping' else 'Traceroute' }}
+                </button>
+            </div>
+
+            <!-- Quick targets -->
+            <div class="quick-targets">
+                <span class="qt-label">Quick:</span>
+                {% set targets = ['127.0.0.1', '8.8.8.8', 'aglg-portal', 'aglg-warehouse'] %}
+                {% for t in targets %}
+                <button type="button" class="qt-btn" onclick="document.getElementById('host').value='{{ t }}'">{{ t }}</button>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if output is not none %}
+<div class="card mt" id="output-card">
+    <div class="card-hdr">
+        <h3>Output</h3>
+        <span class="output-host mono">{{ request.form.get('host','') }}</span>
+    </div>
+    <div class="terminal">
+        <div class="term-bar">
+            <span class="td red"></span><span class="td yellow"></span><span class="td green"></span>
+            <span class="term-title">netops@aglg-monitor — {{ 'ping' if tool == 'ping' else 'traceroute' }}</span>
+        </div>
+        <pre class="term-body mono" id="cmd-output">{{ output }}</pre>
+    </div>
+</div>
+{% endif %}
+
+<!-- Tool toggle -->
+<div class="tool-switch">
+    {% if tool == 'ping' %}
+    <span>Need route tracing? →</span>
+    <a href="{{ url_for('traceroute_tool') }}" class="switch-link" id="switch-traceroute">Switch to Traceroute</a>
+    {% else %}
+    <span>Need host check? →</span>
+    <a href="{{ url_for('ping_tool') }}" class="switch-link" id="switch-ping">Switch to Ping</a>
+    {% endif %}
+</div>
+{% endblock %}

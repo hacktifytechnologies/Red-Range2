@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}AGLG — Vendor Inquiry{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Vendor Inquiry Portal</h2>
+        <p class="page-subtitle">Submit inquiries for logistics partnerships and cargo capacity</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>New Inquiry</h3>
+    </div>
+    {% if submitted %}
+    <div class="alert alert-success" id="inquiry-success">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Inquiry submitted successfully. Our vendor relations team will respond within 2 business days.
+    </div>
+    {% else %}
+    <form method="post" action="{{ url_for('inquiry') }}" class="inquiry-form" id="inquiry-form">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="company">Company / Organisation</label>
+                <input type="text" id="company" name="company" placeholder="Company name" required>
+            </div>
+            <div class="form-group">
+                <label for="contact">Contact Person</label>
+                <input type="text" id="contact" name="contact" placeholder="Full name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Business Email</label>
+                <input type="email" id="email" name="email" placeholder="name@company.com" required>
+            </div>
+            <div class="form-group">
+                <label for="inquiry_type">Inquiry Type</label>
+                <select id="inquiry_type" name="inquiry_type">
+                    <option value="freight">Freight Forwarding</option>
+                    <option value="warehousing">Bonded Warehousing</option>
+                    <option value="cold_chain">Cold Chain Logistics</option>
+                    <option value="contract">Contract Cargo</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="4" placeholder="Describe your logistics requirement..."></textarea>
+        </div>
+        <button type="submit" class="btn-primary" id="inquiry-submit">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+            Submit Inquiry
+        </button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

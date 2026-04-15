@@ -1,0 +1,75 @@
+---
+# Operation BlackVault — Red TTP | M1: SQL Injection Setup
+# Caldera-compatible ability YAML
+# Purpose: Configure the vulnerable Flask portal environment (idempotent alternative to setup.sh)
+
+id: red_01_sqli_setup
+name: "[BLACKVAULT] M1 — Configure SQLi Vulnerable Portal"
+description: |
+  Ensures aglg-portal Flask application is running with the intentionally vulnerable
+  raw SQL query string on /login and unvalidated subprocess call on /report.
+  Sets up SQLite DB, flag, hint file, and systemd service.
+tactic: initial-access
+technique:
+  attack_id: T1190
+  name: Exploit Public-Facing Application
+
+platforms:
+  linux:
+    sh:
+      command: |
+        set -e
+        echo "[*] Verifying M1 aglg-portal setup..."
+
+        # Ensure venv and Flask installed
+        if [ ! -f /opt/aglg/portal/venv/bin/flask ]; then
+          python3 -m venv /opt/aglg/portal/venv
+          /opt/aglg/portal/venv/bin/pip install --quiet flask gunicorn
+        fi
+
+        # Ensure DB exists with users table
+        DB=/opt/aglg/portal/app/aglg.db
+        if [ ! -f "$DB" ]; then
+          sqlite3 "$DB" "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, role TEXT); INSERT INTO users (username,password,role) VALUES ('admin','Adm1n@BlackVault!','admin'),('vendor_ops','V3nd0r@AGLG','vendor');"
+          chown www-data:www-data "$DB"
+        fi
+
+        # Ensure flag exists
+        if [ ! -f /opt/aglg/classified/flag1.txt ]; then
+          mkdir -p /opt/aglg/classified
+          echo "FLAG{$(openssl rand -hex 8)_sqli_auth_bypass}" > /opt/aglg/classified/flag1.txt
+          chmod 600 /opt/aglg/classified/flag1.txt
+          chown www-data:www-data /opt/aglg/classified/flag1.txt
+        fi
+
+        # Ensure hint exists
+        if [ ! -f /opt/aglg/classified/hint.txt ]; then
+          echo "[AGLG INTERNAL]\nWarehouse Inventory API on DMZ — port 3000\nvendor_ops / V3nd0r@AGLG\nScan 11.0.0.0/8 on port 3000." > /opt/aglg/classified/hint.txt
+          chmod 600 /opt/aglg/classified/hint.txt
+          chown www-data:www-data /opt/aglg/classified/hint.txt
+        fi
+
+        # Restart service
+        systemctl restart aglg-portal 2>/dev/null || true
+        echo "[+] M1 aglg-portal configuration verified."
+      cleanup: |
+        echo "[*] No destructive cleanup for M1 red setup."
+
+executors:
+  - name: sh
+    platform: linux
+    elevation_required: true
+
+requirements:
+  - module: basic
+    relationship_match:
+      - source: host
+        edge: has_os
+        target: linux
+
+tags:
+  - range5
+  - blackvault
+  - sqli
+  - m1
+  - red
